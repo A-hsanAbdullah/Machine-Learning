@@ -1,0 +1,53 @@
+When training a Linear Regression model (or most machine learning models) in `scikit-learn`, the shape and dimensions of the input data must adhere to specific rules. Here’s a guide to help you avoid dimension-related errors:
+
+### 1. **Input Data Structure**
+   - **Features (`X`)**: This should be a 2-dimensional array or DataFrame with shape `(n_samples, n_features)`.
+   - **Target (`y`)**: This can be either a 1-dimensional array or Series with shape `(n_samples,)` or a 2-dimensional array with shape `(n_samples, 1)`.
+
+### 2. **Common Scenarios**
+   - **Multiple Features**:
+     - `X` should have multiple columns if you are using more than one feature. For example, if you're using 3 features, `X` should have the shape `(n_samples, 3)`.
+   - **Single Feature**:
+     - `X` should still be 2D even if you have only one feature. In this case, `X` should have the shape `(n_samples, 1)`. You can achieve this by reshaping or using `to_frame()` if you have a Pandas Series.
+
+### 3. **Handling Common Errors**
+   - **Error: "Expected 2D array, got 1D array instead"**:
+     - **Cause**: This occurs when you pass a 1-dimensional array or Series as `X`.
+     - **Solution**: If `X` is a 1D array (like a Series), reshape it into a 2D array using `X.reshape(-1, 1)` or convert it to a DataFrame using `X.to_frame()`.
+
+   - **Error: "Found input variables with inconsistent numbers of samples"**:
+     - **Cause**: This happens when the number of samples (rows) in `X` and `y` do not match.
+     - **Solution**: Ensure that both `X` and `y` have the same number of samples (same number of rows).
+
+### 4. **Examples**
+
+   - **Multiple Features**:
+     ```python
+     X = pd.DataFrame(df.data, columns=df.feature_names)  # X.shape -> (n_samples, n_features)
+     y = pd.Series(df.target)  # y.shape -> (n_samples,)
+     ```
+
+   - **Single Feature**:
+     ```python
+     X = pd.DataFrame(df.data, columns=df.feature_names)[['bp']]  # X.shape -> (n_samples, 1)
+     y = pd.Series(df.target)  # y.shape -> (n_samples,)
+     ```
+
+   - **Reshaping a Single Feature (if `X` is a Series)**:
+     ```python
+     X = X.values.reshape(-1, 1)  # Converts a 1D array to 2D with shape (n_samples, 1)
+     ```
+
+### 5. **Fitting the Model**
+   - Once you ensure that `X` is a 2D array and `y` is a 1D array or a 2D array with one column, you can safely fit the model:
+     ```python
+     model = LinearRegression()
+     model.fit(X, y)
+     ```
+
+### Summary of Rules:
+- **X** must be 2D: If using one feature, it must be reshaped or converted to a DataFrame.
+- **y** can be 1D or 2D: 1D for most cases, 2D only if explicitly required by certain models or tasks.
+- **Dimensions of `X` and `y` must match** in terms of the number of samples (rows).
+
+Following these rules will help prevent dimensionality errors when training a Linear Regression model.
